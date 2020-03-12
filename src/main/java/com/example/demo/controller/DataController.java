@@ -10,13 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping
 public class DataController {
     private DataService dataService;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public DataController(DataService dataService) {
@@ -25,13 +28,16 @@ public class DataController {
 
     //First way
     @GetMapping(value = "/image")
-    public List<Image> getImage() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        URL myURL = new URL("https://s3.amazonaws.com/shielddevtest/photo.txt");
-        List<Image> data = objectMapper.readValue(myURL, new TypeReference<List<Image>>() {
-        });
-        System.out.println(data);
-        dataService.saveData(data);
+    public List<Image> saveImage() {
+        URL myURL = null;
+        List<Image> data = new ArrayList<>();
+        try {
+            myURL = new URL("https://s3.amazonaws.com/shielddevtest/photo.txt");
+            data = objectMapper.readValue(myURL, new TypeReference<List<Image>>() {});
+            dataService.saveData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return data;
     }
 

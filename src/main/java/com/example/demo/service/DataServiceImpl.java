@@ -16,17 +16,22 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public void saveData(List<Image> data) throws IOException {
-        BufferedImage image = ImageIO.read(new URL(data.get(1).getThumbnailUrl()));
-        String line = data.get(1).getThumbnailUrl();
-        int index = line.lastIndexOf("/");
-        String str = line.substring(index + 1);
-        String[] array = str.split("\\.");
-        System.out.println(array[0] + array[1]);
-        File file = new File(array[0]);
-        if (!file.exists()) {
-            file.createNewFile();
+        loadImages(data);
+    }
+
+    private void loadImages(List<Image> data) throws IOException {
+        for (Image image : data) {
+            BufferedImage imageBuf = ImageIO.read(new URL(image.getThumbnailUrl()));
+            String line = image.getThumbnailUrl();
+            int index = line.lastIndexOf("/");
+            String str = line.substring(index + 1);
+            String[] array = str.split("\\.");
+            File file = new File(array[0]);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            ImageIO.write(imageBuf, array[1], file);
+            System.out.println(file.getAbsolutePath());
         }
-        ImageIO.write(image, array[1], file);
-        System.out.println(file.getAbsolutePath());
     }
 }
