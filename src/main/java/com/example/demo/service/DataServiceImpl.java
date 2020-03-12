@@ -13,7 +13,8 @@ import java.util.List;
 
 @Service
 public class DataServiceImpl implements DataService {
-
+private final String ROOT_DIR = "images";
+private final String IMAGE_MINI_DIR = "mini";
     @Override
     public void saveData(List<Image> data) throws IOException {
         loadImages(data);
@@ -21,15 +22,17 @@ public class DataServiceImpl implements DataService {
 
     private void loadImages(List<Image> data) throws IOException {
         for (Image image : data) {
-            BufferedImage imageBuf = ImageIO.read(new URL(image.getThumbnailUrl()));
-            String line = image.getThumbnailUrl();
+            BufferedImage imageBuf = ImageIO.read(new URL(image.getUrl()));
+            String line = image.getUrl();
             int index = line.lastIndexOf("/");
             String str = line.substring(index + 1);
             String[] array = str.split("\\.");
-            File file = new File(array[0]);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+            File fileRootDir = new File(ROOT_DIR);
+            File fileDir = new File(fileRootDir,image.getTitle());
+            File file = new File(fileDir,array[0]);
+            if (!fileRootDir.isDirectory())fileRootDir.mkdir();
+            if (!fileDir.isDirectory())fileDir.mkdir();
+            if (!file.exists()) file.createNewFile();
             ImageIO.write(imageBuf, array[1], file);
             System.out.println(file.getAbsolutePath());
         }
